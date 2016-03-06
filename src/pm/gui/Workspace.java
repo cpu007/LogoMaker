@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -58,6 +59,7 @@ public class Workspace extends AppWorkspaceComponent {
     VBox fillColorMenu;
     VBox outlineColorMenu;
     VBox outlineThicknessMenu;
+    VBox snapshotMenu;
     
     boolean isDrawEnabled = false;
     boolean isShapeSelected = false;
@@ -224,7 +226,19 @@ public class Workspace extends AppWorkspaceComponent {
         
         //Add the controls to the GUI
         outlineThicknessMenu.getChildren().add(outlineThicknessLabel);
-        outlineThicknessMenu.getChildren().add(outlineThicknessSlider);        
+        outlineThicknessMenu.getChildren().add(outlineThicknessSlider);  
+        
+        //Setting up the snapshot menu
+        snapshotMenu = new VBox();
+        snapshotMenu.setAlignment(Pos.CENTER);
+        Label snapshotLabel = new Label("Take a snapshot!");
+        snapshotLabel.getStyleClass().add("subheading_label");
+        Button snapshotButton = new Button();
+        snapshotButton.setGraphic(new ImageView("file:images\\Snapshot.png"));
+        
+        //Adding the snapshot menu controls to the menu
+        snapshotMenu.getChildren().add(snapshotLabel);
+        snapshotMenu.getChildren().add(snapshotButton);
         
         //Add the button layout containers to the GUI
         sideToolbar.getChildren().add(shapeSelectorControlSet);
@@ -232,10 +246,13 @@ public class Workspace extends AppWorkspaceComponent {
         sideToolbar.getChildren().add(backgroundColorMenu);
         sideToolbar.getChildren().add(fillColorMenu);
         sideToolbar.getChildren().add(outlineColorMenu);
-         sideToolbar.getChildren().add(outlineThicknessMenu);
+        sideToolbar.getChildren().add(outlineThicknessMenu);
+        sideToolbar.getChildren().add(snapshotMenu);
         
+        ScrollPane sideScrollPane = new ScrollPane(sideToolbar); 
+        sideScrollPane.getStyleClass().add("max_pane");
         //Set up the workspace with all the components
-        ((BorderPane)workspace).setLeft(sideToolbar);
+        ((BorderPane)workspace).setLeft(sideScrollPane);
         ((BorderPane)workspace).setCenter(appDrawSpace);
         
         // NOTE THAT WE HAVE NOT PUT THE WORKSPACE INTO THE WINDOW,
@@ -265,6 +282,10 @@ public class Workspace extends AppWorkspaceComponent {
         fillColorMenu.getStyleClass().add("control_set");
         outlineColorMenu.getStyleClass().add("max_pane");
         outlineColorMenu.getStyleClass().add("control_set");
+        outlineThicknessMenu.getStyleClass().add("max_pane");
+        outlineThicknessMenu.getStyleClass().add("control_set");
+        snapshotMenu.getStyleClass().add("max_pane");
+        snapshotMenu.getStyleClass().add("control_set");
     }
 
     /**
