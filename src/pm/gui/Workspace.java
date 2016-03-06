@@ -75,13 +75,22 @@ public class Workspace extends AppWorkspaceComponent {
     private static final Color DEFAULT_BACKGROUND_COLOR = Color.valueOf("#ffe4c4");
     private static final Color DEFAULT_FILL_COLOR = Color.valueOf("#ff6666");
     private static final Color DEFAULT_OUTLINE_COLOR = Color.valueOf("#99cc99");
+    private MouseState currentMouseState = MouseState.SELECTOR;
     
     public ArrayList<ColorPicker> activeColors;
     public ArrayList<Shape> shapes;
     public ArrayList<Button> shapeManipulators;
     public double currentOutlineThickness = 5;
     
-    //Use enums with the folowing syntax:
+    
+    public static enum MouseState{
+        SELECTOR,
+        REMOVAL,
+        CREATE_RECT,
+        CREATE_ELLIPSE
+    };
+    
+    //Use these enums with the folowing syntax:
     //[ENUM].[KEY].ordinal();
     
     public static enum ShapeManipulatorIndex {
@@ -145,6 +154,24 @@ public class Workspace extends AppWorkspaceComponent {
         shapeManipulators.add(removeButton);
         shapeManipulators.add(createRectButton);
         shapeManipulators.add(createEllipseButton);
+        
+        //Add Button Functionality Structure
+        shapeSelector.setOnAction(e -> {
+            currentMouseState = MouseState.SELECTOR;
+            reloadWorkspace();
+        });
+        removeButton.setOnAction(e -> {
+            currentMouseState = MouseState.REMOVAL;
+            reloadWorkspace();
+        });
+        createRectButton.setOnAction(e -> {
+            currentMouseState = MouseState.CREATE_RECT;
+            reloadWorkspace();
+        });
+        createEllipseButton.setOnAction(e -> {
+            currentMouseState = MouseState.CREATE_ELLIPSE;
+            reloadWorkspace();
+        });
         
         //Add the buttons to the GUI
         shapeSelectorControlSet.getChildren().add(shapeSelector);
@@ -320,6 +347,14 @@ public class Workspace extends AppWorkspaceComponent {
         outlineThicknessMenu.getStyleClass().add("control_set");
         snapshotMenu.getStyleClass().add("max_pane");
         snapshotMenu.getStyleClass().add("control_set");
+    }
+    
+    /**
+     * This function provides the current mouse state for the application workspace.
+     * @return the current mouse state of the application.
+     */
+    public MouseState getMouseState(){
+        return currentMouseState;
     }
 
     /**
