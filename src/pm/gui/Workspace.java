@@ -398,6 +398,17 @@ public class Workspace extends AppWorkspaceComponent {
                 tempRect.setX(e.getX());
                 tempRect.setY(e.getY());
                 appDrawSpace.getChildren().add(tempRect);
+                tempRect.setOnMouseClicked(x -> {
+                    switch (currentMouseState){
+                        case REMOVAL:
+                            if(shapes.containsKey(tempRect))
+                                shapes.remove(tempRect);
+                            appDrawSpace.getChildren().remove(tempRect);
+                            break;
+                        default:
+                            break;
+                    }
+                });
                 tempRect.setOnMouseDragged(x -> {
                     switch (currentMouseState){
                         case SELECTOR:
@@ -416,6 +427,17 @@ public class Workspace extends AppWorkspaceComponent {
                 tempEllipse.setStroke(DEFAULT_OUTLINE_COLOR);
                 tempEllipse.setCenterX(e.getX());
                 tempEllipse.setCenterY(e.getY());
+                tempEllipse.setOnMouseClicked(x -> {
+                    switch (currentMouseState){
+                        case REMOVAL:
+                            if(shapes.containsKey(tempEllipse))
+                                shapes.remove(tempEllipse);
+                            appDrawSpace.getChildren().remove(tempEllipse);
+                            break;
+                        default:
+                            break;
+                    }
+                });
                 tempEllipse.setOnMouseDragged(x -> {
                     switch (currentMouseState){
                         case SELECTOR:
