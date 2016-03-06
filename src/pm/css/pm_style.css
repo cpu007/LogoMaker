@@ -67,6 +67,8 @@
 
 .render_canvas {
     //-fx-background-color:#ffef84;
+    -fx-fit-to-height: true;
+    -fx-fit-to-width: true;
     -fx-background-color: #ffe4c4;
 }
 

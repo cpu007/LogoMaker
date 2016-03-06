@@ -3,18 +3,22 @@ package pm.gui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableDoubleValue;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
+import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -24,11 +28,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Ellipse;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javax.imageio.ImageIO;
@@ -76,9 +82,10 @@ public class Workspace extends AppWorkspaceComponent {
     private static final Color DEFAULT_FILL_COLOR = Color.valueOf("#ff6666");
     private static final Color DEFAULT_OUTLINE_COLOR = Color.valueOf("#99cc99");
     private MouseState currentMouseState = MouseState.SELECTOR;
+    private Shape selectedShape;
     
     public ArrayList<ColorPicker> activeColors;
-    public ArrayList<Shape> shapes;
+    public HashMap<Shape,Dimension2D> shapes;
     public ArrayList<Button> shapeManipulators;
     public double currentOutlineThickness = 5;
     
@@ -128,10 +135,12 @@ public class Workspace extends AppWorkspaceComponent {
 	// THIS WILL PROVIDE US WITH OUR CUSTOM UI SETTINGS AND TEXT
 	PropertiesManager propsSingleton = PropertiesManager.getPropertiesManager();
         
+        gui.getWindow().setResizable(false);
+        
 	// WE'LL ORGANIZE OUR WORKSPACE COMPONENTS USING A BORDER PANE
 	workspace = new BorderPane();
         activeColors = new ArrayList();
-        shapes = new ArrayList();  
+        shapes = new HashMap();  
         shapeManipulators = new ArrayList();
         appDrawSpace = new Pane();
         sideToolbar = new VBox();
@@ -312,15 +321,17 @@ public class Workspace extends AppWorkspaceComponent {
         
         ScrollPane sideScrollPane = new ScrollPane(sideToolbar); 
         sideScrollPane.getStyleClass().add("max_pane");
+        SplitPane appDrawSpaceContainer = new SplitPane();
+        appDrawSpaceContainer.getItems().add(appDrawSpace);
         //Set up the workspace with all the components
         ((BorderPane)workspace).setLeft(sideScrollPane);
-        ((BorderPane)workspace).setCenter(appDrawSpace);
-        
+        ((BorderPane)workspace).setCenter(appDrawSpaceContainer);
         // NOTE THAT WE HAVE NOT PUT THE WORKSPACE INTO THE WINDOW,
 	// THAT WILL BE DONE WHEN THE USER EITHER CREATES A NEW
 	// COURSE OR LOADS AN EXISTING ONE FOR EDITING
 	workspaceActivated = false;
         initStyle();
+        setUpDrawPaneEventHandlers();
     }
     
     /**
@@ -356,6 +367,110 @@ public class Workspace extends AppWorkspaceComponent {
     public MouseState getMouseState(){
         return currentMouseState;
     }
+    
+    
+    public Pane getDrawPane(){
+        return appDrawSpace;
+    }
+    
+    private void setUpDrawPaneEventHandlers(){
+        appDrawSpace.setOnMouseEntered(e -> {
+        switch (currentMouseState) {
+             case SELECTOR:
+                 appDrawSpace.setCursor(Cursor.DEFAULT);
+                 break;
+             case CREATE_RECT:                    
+             case CREATE_ELLIPSE:
+                 appDrawSpace.setCursor(Cursor.CROSSHAIR);
+                 break;
+             default:
+                 appDrawSpace.setCursor(Cursor.DEFAULT);
+                 break;
+        }});
+        
+        appDrawSpace.setOnMousePressed(e -> {
+        switch (currentMouseState){
+            case CREATE_RECT:
+                selectedShape = new Rectangle(0,0);
+                Rectangle tempRect = (Rectangle)selectedShape;
+                tempRect.setFill(DEFAULT_FILL_COLOR);
+                tempRect.setStroke(DEFAULT_OUTLINE_COLOR);
+                tempRect.setX(e.getX());
+                tempRect.setY(e.getY());
+                appDrawSpace.getChildren().add(tempRect);
+                tempRect.setOnMouseDragged(x -> {
+                    switch (currentMouseState){
+                        case SELECTOR:
+                            tempRect.setX(x.getX());
+                            tempRect.setY(x.getY());
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                break;
+            case CREATE_ELLIPSE:
+                selectedShape = new Ellipse(0,0);
+                Ellipse tempEllipse = (Ellipse)selectedShape;
+                tempEllipse.setFill(DEFAULT_FILL_COLOR);
+                tempEllipse.setStroke(DEFAULT_OUTLINE_COLOR);
+                tempEllipse.setCenterX(e.getX());
+                tempEllipse.setCenterY(e.getY());
+                tempEllipse.setOnMouseDragged(x -> {
+                    switch (currentMouseState){
+                        case SELECTOR:
+                            tempEllipse.setCenterX(x.getX());
+                            tempEllipse.setCenterY(x.getY());
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                appDrawSpace.getChildren().add(tempEllipse);
+                break;
+            default:
+                selectedShape = null;
+                break;
+        }});
+        
+        appDrawSpace.setOnMouseDragged(e -> {
+        switch (currentMouseState){
+            case CREATE_RECT:
+                Rectangle tempRect = (Rectangle)selectedShape;
+                if(tempRect != null){
+                    tempRect.setWidth(e.getX() - tempRect.getX());
+                    tempRect.setHeight(e.getY() - tempRect.getY());
+                }
+                break;
+            case CREATE_ELLIPSE:
+                Ellipse tempEllipse = (Ellipse)selectedShape;
+                if(tempEllipse != null){
+                    tempEllipse.setRadiusX(e.getX() - tempEllipse.getCenterX());
+                    tempEllipse.setRadiusY(e.getY() - tempEllipse.getCenterY());
+                }
+                break;
+            default:
+                selectedShape = null;
+                break;
+        }});
+        
+        appDrawSpace.setOnMouseReleased(e -> {
+        switch (currentMouseState){
+            case CREATE_RECT:
+                Rectangle tempRect = (Rectangle)selectedShape;
+                if(selectedShape != null && !shapes.containsKey(selectedShape))
+                    shapes.put(selectedShape,new Dimension2D(tempRect.getX(),tempRect.getY()));
+                break;
+            case CREATE_ELLIPSE:
+                Ellipse tempEllipse = (Ellipse)selectedShape;
+                if(selectedShape != null && !shapes.containsKey(selectedShape))
+                    shapes.put(selectedShape,new Dimension2D(tempEllipse.getCenterX(),tempEllipse.getCenterY()));
+                break;
+            default:
+                selectedShape = null;
+                break;
+        }});
+    }
 
     /**
      * This function reloads all the controls for editing tag attributes into
@@ -363,6 +478,6 @@ public class Workspace extends AppWorkspaceComponent {
      */
     @Override
     public void reloadWorkspace() {
-
+        
     }
 };
