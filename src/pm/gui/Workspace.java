@@ -61,6 +61,7 @@ public class Workspace extends AppWorkspaceComponent {
     AppGUI gui;
     
     Pane appDrawSpace;
+    SplitPane appDrawSpaceContainer;
     VBox sideToolbar;
     
     BorderPane centerWorkspace;
@@ -251,6 +252,16 @@ public class Workspace extends AppWorkspaceComponent {
                 )
             );
         });
+        fillColorPicker.setOnAction(e -> {
+            if(selectedShape != null){
+                selectedShape.setFill(fillColorPicker.getValue());
+            }
+        });
+        outlineColorPicker.setOnAction(e -> {
+            if (selectedShape != null){
+                selectedShape.setStroke(outlineColorPicker.getValue());
+            }
+        });
         
         //Add the color pickers to the list of color pickers
         activeColors.add(backgroundColorPicker);
@@ -264,6 +275,9 @@ public class Workspace extends AppWorkspaceComponent {
         Slider outlineThicknessSlider = new Slider(0,10,currentOutlineThickness);
         outlineThicknessSlider.valueProperty().addListener(e ->{
             currentOutlineThickness = outlineThicknessSlider.getValue();
+            if(selectedShape != null){
+                selectedShape.setStrokeWidth(currentOutlineThickness);
+            }
         });
         
         //Add the controls to the GUI
@@ -278,7 +292,7 @@ public class Workspace extends AppWorkspaceComponent {
         Button snapshotButton = new Button();
         snapshotButton.setGraphic(new ImageView("file:images\\Snapshot.png"));
         snapshotButton.setOnAction(e -> {
-             WritableImage snapshot = appDrawSpace.snapshot(null, null);
+             WritableImage snapshot = appDrawSpaceContainer.snapshot(null, null);
              try{
                 File imageDestination = new File("./temp/");
                 if(imageDestination.exists()){
@@ -321,7 +335,7 @@ public class Workspace extends AppWorkspaceComponent {
         
         ScrollPane sideScrollPane = new ScrollPane(sideToolbar); 
         sideScrollPane.getStyleClass().add("max_pane");
-        SplitPane appDrawSpaceContainer = new SplitPane();
+        appDrawSpaceContainer = new SplitPane();
         appDrawSpaceContainer.getItems().add(appDrawSpace);
         //Set up the workspace with all the components
         ((BorderPane)workspace).setLeft(sideScrollPane);
@@ -395,11 +409,16 @@ public class Workspace extends AppWorkspaceComponent {
                 Rectangle tempRect = (Rectangle)selectedShape;
                 tempRect.setFill(DEFAULT_FILL_COLOR);
                 tempRect.setStroke(DEFAULT_OUTLINE_COLOR);
+                tempRect.setStrokeWidth(currentOutlineThickness);
                 tempRect.setX(e.getX());
                 tempRect.setY(e.getY());
                 appDrawSpace.getChildren().add(tempRect);
                 tempRect.setOnMouseClicked(x -> {
                     switch (currentMouseState){
+                        case SELECTOR:
+                            selectedShape = tempRect;
+                            updateControls();
+                            break;
                         case REMOVAL:
                             if(shapes.containsKey(tempRect))
                                 shapes.remove(tempRect);
@@ -425,10 +444,15 @@ public class Workspace extends AppWorkspaceComponent {
                 Ellipse tempEllipse = (Ellipse)selectedShape;
                 tempEllipse.setFill(DEFAULT_FILL_COLOR);
                 tempEllipse.setStroke(DEFAULT_OUTLINE_COLOR);
+                tempEllipse.setStrokeWidth(currentOutlineThickness);
                 tempEllipse.setCenterX(e.getX());
                 tempEllipse.setCenterY(e.getY());
                 tempEllipse.setOnMouseClicked(x -> {
                     switch (currentMouseState){
+                        case SELECTOR:
+                            selectedShape = tempEllipse;
+                            updateControls();
+                            break;
                         case REMOVAL:
                             if(shapes.containsKey(tempEllipse))
                                 shapes.remove(tempEllipse);
@@ -492,6 +516,12 @@ public class Workspace extends AppWorkspaceComponent {
                 selectedShape = null;
                 break;
         }});
+    }
+    
+    private void updateControls(){
+        if(selectedShape != null){
+            //Update controls
+        }
     }
 
     /**
