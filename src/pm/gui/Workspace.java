@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableDoubleValue;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -28,7 +24,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -82,6 +77,7 @@ public class Workspace extends AppWorkspaceComponent {
     private static final Color DEFAULT_BACKGROUND_COLOR = Color.valueOf("#ffe4c4");
     private static final Color DEFAULT_FILL_COLOR = Color.valueOf("#ff6666");
     private static final Color DEFAULT_OUTLINE_COLOR = Color.valueOf("#99cc99");
+    private static Slider outlineThicknessSlider;
     private MouseState currentMouseState = MouseState.SELECTOR;
     private Shape selectedShape;
     
@@ -199,6 +195,14 @@ public class Workspace extends AppWorkspaceComponent {
         sendToBackButton.setGraphic(new ImageView("file:images\\MoveToBack.png"));
         sendToFrontButton.setGraphic(new ImageView("file:images\\MoveToFront.png"));
         
+        sendToBackButton.setOnAction(e -> {
+            
+        });
+        
+        sendToFrontButton.setOnAction(e -> {
+        
+        });
+        
         shapeManipulators.add(sendToBackButton);
         shapeManipulators.add(sendToFrontButton);
         
@@ -272,7 +276,7 @@ public class Workspace extends AppWorkspaceComponent {
         outlineThicknessMenu = new VBox(10);
         Label outlineThicknessLabel = new Label("Outline Thickness");
         outlineThicknessLabel.getStyleClass().add("subheading_label");
-        Slider outlineThicknessSlider = new Slider(0,10,currentOutlineThickness);
+        outlineThicknessSlider = new Slider(0,20,currentOutlineThickness);
         outlineThicknessSlider.valueProperty().addListener(e ->{
             currentOutlineThickness = outlineThicknessSlider.getValue();
             if(selectedShape != null){
@@ -403,6 +407,7 @@ public class Workspace extends AppWorkspaceComponent {
         }});
         
         appDrawSpace.setOnMousePressed(e -> {
+        currentOutlineThickness = 5;
         switch (currentMouseState){
             case CREATE_RECT:
                 selectedShape = new Rectangle(0,0);
@@ -477,7 +482,9 @@ public class Workspace extends AppWorkspaceComponent {
             default:
                 selectedShape = null;
                 break;
-        }});
+        }
+        updateControls();
+        });
         
         appDrawSpace.setOnMouseDragged(e -> {
         switch (currentMouseState){
@@ -520,7 +527,12 @@ public class Workspace extends AppWorkspaceComponent {
     
     private void updateControls(){
         if(selectedShape != null){
-            //Update controls
+            ColorPicker colorPicker = activeColors.get(ColorPickerIndex.FILLCOLOR.ordinal());
+            colorPicker.setValue(Color.valueOf(selectedShape.getFill().toString()));
+            colorPicker = activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal());
+            colorPicker.setValue(Color.valueOf(selectedShape.getStroke().toString()));
+            outlineThicknessSlider.adjustValue(selectedShape.getStrokeWidth());
+            currentOutlineThickness = outlineThicknessSlider.getValue();
         }
     }
 
