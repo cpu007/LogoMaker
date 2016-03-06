@@ -7,6 +7,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableDoubleValue;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -27,6 +29,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import properties_manager.PropertiesManager;
 import saf.ui.AppGUI;
 import saf.AppTemplate;
@@ -235,6 +241,34 @@ public class Workspace extends AppWorkspaceComponent {
         snapshotLabel.getStyleClass().add("subheading_label");
         Button snapshotButton = new Button();
         snapshotButton.setGraphic(new ImageView("file:images\\Snapshot.png"));
+        snapshotButton.setOnAction(e -> {
+             WritableImage snapshot = appDrawSpace.snapshot(null, null);
+             try{
+                File imageDestination = new File("./temp/");
+                if(imageDestination.exists()){
+                    if(!imageDestination.isDirectory()){
+                        imageDestination.mkdir();
+                    }
+                }
+                else{
+                    imageDestination.mkdir();
+                }
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setInitialDirectory(imageDestination);
+                fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG (*.png)", "*.png"));
+                imageDestination = fileChooser.showSaveDialog(null);
+                if(imageDestination != null){
+                    if(!imageDestination.getName().endsWith(".png"))
+                        imageDestination = new File(imageDestination.getPath() + ".png");
+                    try (ImageOutputStream out = ImageIO.createImageOutputStream(imageDestination)) {
+                        ImageIO.write(
+                                SwingFXUtils.fromFXImage(snapshot, null), "png",
+                                out
+                        );
+                    }
+                }
+             }catch(IOException ioe){}
+        });
         
         //Adding the snapshot menu controls to the menu
         snapshotMenu.getChildren().add(snapshotLabel);
