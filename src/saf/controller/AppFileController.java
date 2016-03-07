@@ -214,16 +214,19 @@ public class AppFileController {
     }
     
     private void loadWork(File selectedFile) throws IOException{
-        ((FileManager)app.getFileComponent()).loadData(app.getDataComponent(), selectedFile.getPath());
-        
-        // LOAD ALL THE DATA INTO THE WORKSPACE
-        app.getWorkspaceComponent().reloadWorkspace();	
-       
+        AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+	PropertiesManager props = PropertiesManager.getPropertiesManager();
+
+        // RESET THE DATA, WHICH SHOULD TRIGGER A RESET OF THE UI
+        app.getDataComponent().reset();        
+
         // MAKE SURE THE WORKSPACE IS ACTIVATED
         app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
-        
-         // LOAD ALL THE DATA INTO THE WORKSPACE
-        app.getWorkspaceComponent().reloadWorkspace();	
+
+        // TELL THE USER NEW WORK IS UNDERWAY
+        dialog.show("Loaded", "Successfully loaded");
+            
+        ((FileManager)app.getFileComponent()).loadData(app.getDataComponent(), selectedFile.getPath());
         
         currentWorkFile = selectedFile;
 	saved = true;

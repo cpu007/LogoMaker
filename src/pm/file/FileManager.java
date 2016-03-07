@@ -11,6 +11,10 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.geometry.Dimension2D;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
@@ -196,7 +200,9 @@ public class FileManager implements AppFileComponent {
 	
 	// AND GET THE BACKGROUND COLOR
 	String backgroundColor = json.getString("background-color");
-	
+	workspace.getDrawPane().setBackground(
+            new Background(new BackgroundFill(Paint.valueOf(backgroundColor),CornerRadii.EMPTY,Insets.EMPTY))
+        );
     }
 
     // HELPER METHOD FOR LOADING DATA FROM A JSON FORMAT
