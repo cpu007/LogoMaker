@@ -39,7 +39,8 @@ public class DataManager implements AppDataComponent {
         if(workspace != null){
             workspace.getDrawPane().getChildren().clear();
             workspace.shapes.clear();
-            workspace.reloadWorkspace();
+            workspace.resetWorkspace();
+            workspace.reloadWorkspace();            
         }
         else{
             workspace = ((Workspace)app.getWorkspaceComponent());

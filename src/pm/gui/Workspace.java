@@ -196,11 +196,15 @@ public class Workspace extends AppWorkspaceComponent {
         sendToFrontButton.setGraphic(new ImageView("file:images\\MoveToFront.png"));
         
         sendToBackButton.setOnAction(e -> {
-            
+            if(selectedShape != null){
+                selectedShape.toBack();
+            }
         });
         
         sendToFrontButton.setOnAction(e -> {
-        
+            if(selectedShape != null){
+                selectedShape.toFront();
+            }
         });
         
         shapeManipulators.add(sendToBackButton);
@@ -391,6 +395,28 @@ public class Workspace extends AppWorkspaceComponent {
         return appDrawSpace;
     }
     
+    public void resetWorkspace(){
+        try{
+            selectedShape = null;
+            currentOutlineThickness = 5;
+            activeColors.get(ColorPickerIndex.BACKGROUNDCOLOR.ordinal()).setValue(DEFAULT_BACKGROUND_COLOR);
+            activeColors.get(ColorPickerIndex.FILLCOLOR.ordinal()).setValue(DEFAULT_FILL_COLOR);
+            activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).setValue(DEFAULT_OUTLINE_COLOR);
+            currentMouseState = MouseState.SELECTOR;
+            appDrawSpace.setBackground(
+                new Background(
+                    new BackgroundFill(
+                            activeColors.get(
+                                ColorPickerIndex.BACKGROUNDCOLOR.ordinal()
+                            ).getValue(),
+                            CornerRadii.EMPTY,
+                            Insets.EMPTY
+                    )
+                )
+            );
+        }catch(NullPointerException NPE){}
+    }
+    
     private void setUpDrawPaneEventHandlers(){
         appDrawSpace.setOnMouseEntered(e -> {
         switch (currentMouseState) {
@@ -407,6 +433,8 @@ public class Workspace extends AppWorkspaceComponent {
         }});
         
         appDrawSpace.setOnMousePressed(e -> {
+        if(selectedShape != null)
+            selectedShape.setStroke(activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).getValue());
         currentOutlineThickness = 5;
         switch (currentMouseState){
             case CREATE_RECT:
@@ -423,6 +451,7 @@ public class Workspace extends AppWorkspaceComponent {
                         case SELECTOR:
                             selectedShape = tempRect;
                             updateControls();
+                            tempRect.setStroke(Paint.valueOf("yellow"));
                             break;
                         case REMOVAL:
                             if(shapes.containsKey(tempRect))
@@ -457,6 +486,7 @@ public class Workspace extends AppWorkspaceComponent {
                         case SELECTOR:
                             selectedShape = tempEllipse;
                             updateControls();
+                            tempEllipse.setStroke(Paint.valueOf("yellow"));
                             break;
                         case REMOVAL:
                             if(shapes.containsKey(tempEllipse))
@@ -480,6 +510,8 @@ public class Workspace extends AppWorkspaceComponent {
                 appDrawSpace.getChildren().add(tempEllipse);
                 break;
             default:
+                if(selectedShape != null)
+                    selectedShape.setStroke(activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).getValue());
                 selectedShape = null;
                 break;
         }
