@@ -92,7 +92,8 @@ public class FileManager implements AppFileComponent {
                     .add("Coordinates", coordinates)
                     .add("Dimensions", dimensions)
                     .add("fill-color", shape.getFill().toString())
-                    .add("border-color", (shape != selectedShape)?shape.getStroke().toString():
+                    .add("border-color", (shape != selectedShape)?
+                            shape.getStroke().toString():
                             dataManager.getSelectedOutlineFill())
                     .add("border-width", shape.getStrokeWidth());
             return shapeObjectBuilder;
