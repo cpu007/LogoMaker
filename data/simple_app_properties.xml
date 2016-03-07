@@ -54,8 +54,8 @@
         <property name="SAVE_UNSAVED_WORK_MESSAGE"	value="Do you want to save your unsaved work first?"></property>
 	<property name="SAVE_WORK_TITLE"		value="Save your work"></property>
 	<property name="LOAD_WORK_TITLE"		value="Select work file to load"></property>
-	<property name="WORK_FILE_EXT"			value="wpm"></property>
-	<property name="WORK_FILE_EXT_DESC"		value="Web Page Maker Files"></property>
+	<property name="WORK_FILE_EXT"			value="pm"></property>
+	<property name="WORK_FILE_EXT_DESC"		value="Pose Maker Files"></property>
     </property_list>
     <property_options_list>
     </property_options_list>

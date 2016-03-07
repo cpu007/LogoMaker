@@ -1,5 +1,9 @@
 package pm.data;
 
+import java.util.HashMap;
+import javafx.geometry.Dimension2D;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Shape;
 import pm.gui.Workspace;
 import saf.components.AppDataComponent;
 import saf.AppTemplate;
@@ -8,7 +12,7 @@ import saf.AppTemplate;
  * This class serves as the data management component for this application.
  *
  * @author Richard McKenna
- * @author ?
+ * @author Kenneth Chiguichon
  * @version 1.0
  */
 public class DataManager implements AppDataComponent {
@@ -29,6 +33,15 @@ public class DataManager implements AppDataComponent {
         
         // KEEP THE WORKSPACE FOR LATER
         workspace = ((Workspace)app.getWorkspaceComponent());
+    }
+    
+    public HashMap<Shape,Dimension2D> getShapes(){
+        if(workspace != null) return workspace.getShapes();
+        else return null;
+    }
+    
+    public Paint getBackgroundColor(){
+        return workspace.getDrawPane().getBackground().getFills().get(0).getFill();
     }
 
     /**

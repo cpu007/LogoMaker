@@ -164,7 +164,7 @@ public class AppFileController {
 	
 	// MARK IT AS SAVED
 	currentWorkFile = selectedFile;
-	saved = true;
+	//saved = true;
 	
 	// TELL THE USER THE FILE HAS BEEN SAVED
 	AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
@@ -173,7 +173,7 @@ public class AppFileController {
 		    
 	// AND REFRESH THE GUI, WHICH WILL ENABLE AND DISABLE
 	// THE APPROPRIATE CONTROLS
-	app.getGUI().updateToolbarControls(saved);	
+	//app.getGUI().updateToolbarControls(saved);	
     }
     
     public void handleLoadRequest(){

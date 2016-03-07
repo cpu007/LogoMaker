@@ -9,7 +9,7 @@ import java.io.IOException;
  * called from this framework.
  * 
  * @author Richard McKenna
- * @author ?
+ * @author Kenneth Chiguichon
  * @version 1.0
  */
 public interface AppFileComponent {

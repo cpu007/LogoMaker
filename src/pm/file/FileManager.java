@@ -1,11 +1,30 @@
 package pm.file;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import javafx.geometry.Dimension2D;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
+import javax.json.JsonValue;
+import javax.json.JsonWriter;
+import javax.json.JsonWriterFactory;
+import javax.json.stream.JsonGenerator;
+import pm.data.DataManager;
 import saf.components.AppDataComponent;
 import saf.components.AppFileComponent;
 
@@ -14,7 +33,7 @@ import saf.components.AppFileComponent;
  * providing all I/O services.
  *
  * @author Richard McKenna
- * @author ?
+ * @author Kenneth Chiguichon
  * @version 1.0
  */
 public class FileManager implements AppFileComponent {
@@ -33,7 +52,62 @@ public class FileManager implements AppFileComponent {
      */
     @Override
     public void saveData(AppDataComponent data, String filePath) throws IOException {
+        StringWriter sw = new StringWriter();
 
+	// BUILD THE HTMLTags ARRAY
+	DataManager dataManager = (DataManager)data;
+
+	//Build Shapes Array
+	JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        for(Shape shape : dataManager.getShapes().keySet()){
+            JsonObjectBuilder shapeObjectBuilder = Json.createObjectBuilder();
+            if(shape instanceof Rectangle) shapeObjectBuilder.add("Type", "Rectangle");
+            else if(shape instanceof Ellipse) shapeObjectBuilder.add("Type", "Ellipse");
+            JsonObjectBuilder coordinates = Json.createObjectBuilder()
+                    .add("x-location", dataManager.getShapes().get(shape).getWidth())
+                    .add("y-location", dataManager.getShapes().get(shape).getHeight());
+            JsonObjectBuilder dimensions = Json.createObjectBuilder()
+                    .add("width", 
+                        (shape instanceof Rectangle)?
+                            ((Rectangle)shape).getWidth():
+                            ((Ellipse)shape).getRadiusX()
+                    )
+                    .add("height", 
+                        (shape instanceof Rectangle)?
+                            ((Rectangle)shape).getHeight():
+                            ((Ellipse)shape).getRadiusY()
+                    );
+            shapeObjectBuilder
+                    .add("Coordinates", coordinates)
+                    .add("Dimensions", dimensions)
+                    .add("fill-color", shape.getFill().toString())
+                    .add("border-color", shape.getStroke().toString())
+                    .add("border-width", shape.getStrokeWidth());
+            arrayBuilder.add(shapeObjectBuilder);
+        }
+	
+	// THEN PUT IT ALL TOGETHER IN A JsonObject
+	JsonObject dataManagerJSO = Json.createObjectBuilder()
+                .add("Background-Color", dataManager.getBackgroundColor().toString())
+                .add("Shapes", arrayBuilder)
+		.build();
+	
+	// AND NOW OUTPUT IT TO A JSON FILE WITH PRETTY PRINTING
+	Map<String, Object> properties = new HashMap<>(1);
+	properties.put(JsonGenerator.PRETTY_PRINTING, true);
+	JsonWriterFactory writerFactory = Json.createWriterFactory(properties);
+        try (JsonWriter jsonWriter = writerFactory.createWriter(sw)) {
+            jsonWriter.writeObject(dataManagerJSO);
+        }
+
+	// INIT THE WRITER
+	OutputStream os = new FileOutputStream(filePath);
+	JsonWriter jsonFileWriter = Json.createWriter(os);
+	jsonFileWriter.writeObject(dataManagerJSO);
+	String prettyPrinted = sw.toString();
+        try (PrintWriter pw = new PrintWriter(filePath)) {
+            pw.write(prettyPrinted);
+        }
     }
       
     /**
@@ -63,33 +137,10 @@ public class FileManager implements AppFileComponent {
 	is.close();
 	return json;
     }
-    
-    /**
-     * This method exports the contents of the data manager to a 
-     * Web page including the html page, needed directories, and
-     * the CSS file.
-     * 
-     * @param data The data management component.
-     * 
-     * @param filePath Path (including file name/extension) to where
-     * to export the page to.
-     * 
-     * @throws IOException Thrown should there be an error writing
-     * out data to the file.
-     */
-    @Override
-    public void exportData(AppDataComponent data, String filePath) throws IOException {
 
-    }
-    
-    /**
-     * This method is provided to satisfy the compiler, but it
-     * is not used by this application.
-     */
     @Override
-    public void importData(AppDataComponent data, String filePath) throws IOException {
-	// NOTE THAT THE Web Page Maker APPLICATION MAKES
-	// NO USE OF THIS METHOD SINCE IT NEVER IMPORTS
-	// EXPORTED WEB PAGES
-    }
+    public void exportData(AppDataComponent data, String filePath) throws IOException {}
+
+    @Override
+    public void importData(AppDataComponent data, String filePath) throws IOException {}
 }

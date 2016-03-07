@@ -395,6 +395,10 @@ public class Workspace extends AppWorkspaceComponent {
         return appDrawSpace;
     }
     
+    public HashMap<Shape, Dimension2D> getShapes(){
+        return shapes;
+    }
+    
     public void resetWorkspace(){
         try{
             selectedShape = null;
@@ -435,13 +439,12 @@ public class Workspace extends AppWorkspaceComponent {
         appDrawSpace.setOnMousePressed(e -> {
         if(selectedShape != null)
             selectedShape.setStroke(activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).getValue());
-        currentOutlineThickness = 5;
         switch (currentMouseState){
             case CREATE_RECT:
                 selectedShape = new Rectangle(0,0);
                 Rectangle tempRect = (Rectangle)selectedShape;
-                tempRect.setFill(DEFAULT_FILL_COLOR);
-                tempRect.setStroke(DEFAULT_OUTLINE_COLOR);
+                tempRect.setFill(activeColors.get(ColorPickerIndex.FILLCOLOR.ordinal()).getValue());
+                tempRect.setStroke(activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).getValue());
                 tempRect.setStrokeWidth(currentOutlineThickness);
                 tempRect.setX(e.getX());
                 tempRect.setY(e.getY());
@@ -476,8 +479,8 @@ public class Workspace extends AppWorkspaceComponent {
             case CREATE_ELLIPSE:
                 selectedShape = new Ellipse(0,0);
                 Ellipse tempEllipse = (Ellipse)selectedShape;
-                tempEllipse.setFill(DEFAULT_FILL_COLOR);
-                tempEllipse.setStroke(DEFAULT_OUTLINE_COLOR);
+                tempEllipse.setFill(activeColors.get(ColorPickerIndex.FILLCOLOR.ordinal()).getValue());
+                tempEllipse.setStroke(activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).getValue());
                 tempEllipse.setStrokeWidth(currentOutlineThickness);
                 tempEllipse.setCenterX(e.getX());
                 tempEllipse.setCenterY(e.getY());
@@ -552,9 +555,10 @@ public class Workspace extends AppWorkspaceComponent {
                     shapes.put(selectedShape,new Dimension2D(tempEllipse.getCenterX(),tempEllipse.getCenterY()));
                 break;
             default:
-                selectedShape = null;
                 break;
-        }});
+        }
+        selectedShape = null;
+        });
     }
     
     private void updateControls(){
