@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.geometry.Dimension2D;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -25,6 +26,7 @@ import javax.json.JsonWriter;
 import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
 import pm.data.DataManager;
+import pm.gui.Workspace;
 import saf.components.AppDataComponent;
 import saf.components.AppFileComponent;
 
@@ -56,39 +58,51 @@ public class FileManager implements AppFileComponent {
 
 	// BUILD THE HTMLTags ARRAY
 	DataManager dataManager = (DataManager)data;
+        
+        Shape selectedShape = dataManager.getSelectedShape();
 
 	//Build Shapes Array
 	JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        for(Shape shape : dataManager.getShapes().keySet()){
+        dataManager.getShapes().keySet().stream().map((shape) -> {
             JsonObjectBuilder shapeObjectBuilder = Json.createObjectBuilder();
             if(shape instanceof Rectangle) shapeObjectBuilder.add("Type", "Rectangle");
             else if(shape instanceof Ellipse) shapeObjectBuilder.add("Type", "Ellipse");
             JsonObjectBuilder coordinates = Json.createObjectBuilder()
-                    .add("x-location", dataManager.getShapes().get(shape).getWidth())
-                    .add("y-location", dataManager.getShapes().get(shape).getHeight());
+                    .add("x-location", 
+                            (shape instanceof Rectangle)?
+                                    ((Rectangle)shape).getX():
+                                    ((Ellipse)shape).getCenterX())
+                    .add("y-location", 
+                            (shape instanceof Rectangle)?
+                                    ((Rectangle)shape).getY():
+                                    ((Ellipse)shape).getCenterY()
+                    );
             JsonObjectBuilder dimensions = Json.createObjectBuilder()
-                    .add("width", 
-                        (shape instanceof Rectangle)?
-                            ((Rectangle)shape).getWidth():
-                            ((Ellipse)shape).getRadiusX()
+                    .add("width",
+                            (shape instanceof Rectangle)?
+                                    ((Rectangle)shape).getWidth():
+                                    ((Ellipse)shape).getRadiusX()
                     )
-                    .add("height", 
-                        (shape instanceof Rectangle)?
-                            ((Rectangle)shape).getHeight():
-                            ((Ellipse)shape).getRadiusY()
+                    .add("height",
+                            (shape instanceof Rectangle)?
+                                    ((Rectangle)shape).getHeight():
+                                    ((Ellipse)shape).getRadiusY()
                     );
             shapeObjectBuilder
                     .add("Coordinates", coordinates)
                     .add("Dimensions", dimensions)
                     .add("fill-color", shape.getFill().toString())
-                    .add("border-color", shape.getStroke().toString())
+                    .add("border-color", (shape != selectedShape)?shape.getStroke().toString():
+                            dataManager.getSelectedOutlineFill())
                     .add("border-width", shape.getStrokeWidth());
+            return shapeObjectBuilder;
+        }).forEach((shapeObjectBuilder) -> {
             arrayBuilder.add(shapeObjectBuilder);
-        }
+        });
 	
 	// THEN PUT IT ALL TOGETHER IN A JsonObject
 	JsonObject dataManagerJSO = Json.createObjectBuilder()
-                .add("Background-Color", dataManager.getBackgroundColor().toString())
+                .add("background-color", dataManager.getBackgroundColor().toString())
                 .add("Shapes", arrayBuilder)
 		.build();
 	
@@ -125,16 +139,72 @@ public class FileManager implements AppFileComponent {
      */
     @Override
     public void loadData(AppDataComponent data, String filePath) throws IOException {
-
+        // CLEAR THE OLD DATA OUT
+	DataManager dataManager = (DataManager)data;
+	dataManager.reset();
+	
+	// LOAD THE JSON FILE WITH ALL THE DATA
+	JsonObject json = loadJSONFile(filePath);
+	
+        Workspace workspace = dataManager.getWorkspace();
+        
+	// LOAD THE Shape Array
+	JsonArray jsonShapeArray = json.getJsonArray("Shapes");
+        for(int i=0; i < jsonShapeArray.size(); i++){
+            Shape tempShape;
+            JsonObject jsonShapeObject = jsonShapeArray.getJsonObject(i);
+            if(jsonShapeObject.getString("Type").equals("Rectangle")){
+                tempShape = new Rectangle(0,0);
+            }
+            else{
+                tempShape = new Ellipse(0,0);
+            }
+            double xLocation, yLocation, width, height, borderWidth;
+            Paint fillColor, borderColor;
+            Dimension2D shapeLocation;
+            JsonObject coordinates, dimensions;
+            coordinates = jsonShapeObject.getJsonObject("Coordinates");
+            dimensions = jsonShapeObject.getJsonObject("Dimensions");
+            xLocation = coordinates.getJsonNumber("x-location").doubleValue();
+            yLocation = coordinates.getJsonNumber("y-location").doubleValue();
+            width = dimensions.getJsonNumber("width").doubleValue();
+            height = dimensions.getJsonNumber("height").doubleValue();
+            borderWidth = jsonShapeObject.getJsonNumber("border-width").doubleValue();
+            fillColor = Paint.valueOf(jsonShapeObject.getString("fill-color"));
+            borderColor = Paint.valueOf(jsonShapeObject.getString("border-color"));
+            shapeLocation = new Dimension2D(xLocation,yLocation);
+            if (tempShape instanceof Rectangle){
+                ((Rectangle) tempShape).setX(xLocation);
+                ((Rectangle) tempShape).setY(yLocation);
+                ((Rectangle) tempShape).setWidth(width);
+                ((Rectangle) tempShape).setHeight(height);
+            }
+            else{
+                ((Ellipse)tempShape).setCenterX(xLocation);
+                ((Ellipse)tempShape).setCenterY(yLocation);
+                ((Ellipse)tempShape).setRadiusX(width);
+                ((Ellipse)tempShape).setRadiusY(height);
+            }
+            tempShape.setFill(fillColor);
+            tempShape.setStroke(borderColor);
+            tempShape.setStrokeWidth(borderWidth);
+            dataManager.getShapes().put(tempShape, shapeLocation);
+            workspace.getDrawPane().getChildren().add(tempShape);
+            workspace.setShapeListeners(tempShape);
+        }
+	
+	// AND GET THE BACKGROUND COLOR
+	String backgroundColor = json.getString("background-color");
+	
     }
 
     // HELPER METHOD FOR LOADING DATA FROM A JSON FORMAT
     private JsonObject loadJSONFile(String jsonFilePath) throws IOException {
-	InputStream is = new FileInputStream(jsonFilePath);
-	JsonReader jsonReader = Json.createReader(is);
-	JsonObject json = jsonReader.readObject();
-	jsonReader.close();
-	is.close();
+        JsonObject json;
+        try (InputStream is = new FileInputStream(jsonFilePath); 
+             JsonReader jsonReader = Json.createReader(is)) {
+            json = jsonReader.readObject();
+        }
 	return json;
     }
 

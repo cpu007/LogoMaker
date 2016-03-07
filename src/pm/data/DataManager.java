@@ -35,8 +35,20 @@ public class DataManager implements AppDataComponent {
         workspace = ((Workspace)app.getWorkspaceComponent());
     }
     
+    public Shape getSelectedShape(){
+        return workspace.getSelectedShape();
+    }
+    
+    public String getSelectedOutlineFill(){
+        return workspace.getSelectedOutlineFill();
+    }
+    
+    public Workspace getWorkspace(){
+        return workspace;
+    }
+    
     public HashMap<Shape,Dimension2D> getShapes(){
-        if(workspace != null) return workspace.getShapes();
+        if(workspace != null) return workspace.shapes;
         else return null;
     }
     

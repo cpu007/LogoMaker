@@ -214,7 +214,7 @@ public class AppFileController {
     }
     
     private void loadWork(File selectedFile) throws IOException{
-        
+        ((FileManager)app.getFileComponent()).loadData(app.getDataComponent(), selectedFile.getPath());
         
         // LOAD ALL THE DATA INTO THE WORKSPACE
         app.getWorkspaceComponent().reloadWorkspace();	

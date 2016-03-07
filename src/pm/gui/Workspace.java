@@ -390,6 +390,13 @@ public class Workspace extends AppWorkspaceComponent {
         return currentMouseState;
     }
     
+    public Shape getSelectedShape(){
+        return selectedShape;
+    }
+    
+    public String getSelectedOutlineFill(){
+        return activeColors.get(ColorPickerIndex.OUTLINECOLOR.ordinal()).getValue().toString();
+    }
     
     public Pane getDrawPane(){
         return appDrawSpace;
@@ -449,32 +456,7 @@ public class Workspace extends AppWorkspaceComponent {
                 tempRect.setX(e.getX());
                 tempRect.setY(e.getY());
                 appDrawSpace.getChildren().add(tempRect);
-                tempRect.setOnMouseClicked(x -> {
-                    switch (currentMouseState){
-                        case SELECTOR:
-                            selectedShape = tempRect;
-                            updateControls();
-                            tempRect.setStroke(Paint.valueOf("yellow"));
-                            break;
-                        case REMOVAL:
-                            if(shapes.containsKey(tempRect))
-                                shapes.remove(tempRect);
-                            appDrawSpace.getChildren().remove(tempRect);
-                            break;
-                        default:
-                            break;
-                    }
-                });
-                tempRect.setOnMouseDragged(x -> {
-                    switch (currentMouseState){
-                        case SELECTOR:
-                            tempRect.setX(x.getX());
-                            tempRect.setY(x.getY());
-                            break;
-                        default:
-                            break;
-                    }
-                });
+                setShapeListeners(tempRect);
                 break;
             case CREATE_ELLIPSE:
                 selectedShape = new Ellipse(0,0);
@@ -484,33 +466,8 @@ public class Workspace extends AppWorkspaceComponent {
                 tempEllipse.setStrokeWidth(currentOutlineThickness);
                 tempEllipse.setCenterX(e.getX());
                 tempEllipse.setCenterY(e.getY());
-                tempEllipse.setOnMouseClicked(x -> {
-                    switch (currentMouseState){
-                        case SELECTOR:
-                            selectedShape = tempEllipse;
-                            updateControls();
-                            tempEllipse.setStroke(Paint.valueOf("yellow"));
-                            break;
-                        case REMOVAL:
-                            if(shapes.containsKey(tempEllipse))
-                                shapes.remove(tempEllipse);
-                            appDrawSpace.getChildren().remove(tempEllipse);
-                            break;
-                        default:
-                            break;
-                    }
-                });
-                tempEllipse.setOnMouseDragged(x -> {
-                    switch (currentMouseState){
-                        case SELECTOR:
-                            tempEllipse.setCenterX(x.getX());
-                            tempEllipse.setCenterY(x.getY());
-                            break;
-                        default:
-                            break;
-                    }
-                });
                 appDrawSpace.getChildren().add(tempEllipse);
+                setShapeListeners(tempEllipse);
                 break;
             default:
                 if(selectedShape != null)
@@ -561,6 +518,49 @@ public class Workspace extends AppWorkspaceComponent {
         });
     }
     
+    public void setShapeListeners(Shape tempShape){
+        tempShape.setOnMouseClicked(x -> {
+            switch (currentMouseState){
+                case SELECTOR:
+                    selectedShape = tempShape;
+                    updateControls();
+                    tempShape.setStroke(Paint.valueOf("yellow"));
+                    break;
+                case REMOVAL:
+                    if(shapes.containsKey(tempShape))
+                        shapes.remove(tempShape);
+                    appDrawSpace.getChildren().remove(tempShape);
+                    break;
+                default:
+                    break;
+            }
+        });
+        if(tempShape instanceof Rectangle){
+            tempShape.setOnMouseDragged(x -> {
+                switch (currentMouseState){
+                    case SELECTOR:
+                        ((Rectangle)tempShape).setX(x.getX());
+                        ((Rectangle)tempShape).setY(x.getY());
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
+        else{
+            tempShape.setOnMouseDragged(x -> {
+                switch (currentMouseState){
+                    case SELECTOR:
+                        ((Ellipse)tempShape).setCenterX(x.getX());
+                        ((Ellipse)tempShape).setCenterY(x.getY());
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
+    }
+    
     private void updateControls(){
         if(selectedShape != null){
             ColorPicker colorPicker = activeColors.get(ColorPickerIndex.FILLCOLOR.ordinal());
@@ -571,7 +571,7 @@ public class Workspace extends AppWorkspaceComponent {
             currentOutlineThickness = outlineThicknessSlider.getValue();
         }
     }
-
+    
     /**
      * This function reloads all the controls for editing tag attributes into
      * the workspace.
