@@ -40,6 +40,10 @@ public class DataManager implements AppDataComponent {
         return workspace.getSelectedShape();
     }
     
+    public void setBackgroundColor(Paint color){
+        workspace.setBackgroundColor(color);
+    }
+    
     public String getSelectedOutlineFill(){
         return workspace.getSelectedOutlineFill();
     }

@@ -3,10 +3,8 @@ package pm.gui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -16,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -72,7 +71,6 @@ public class Workspace extends AppWorkspaceComponent {
     
     boolean isDrawEnabled = false;
     boolean isShapeSelected = false;
-    
     
     
     private static final Color DEFAULT_BACKGROUND_COLOR = Color.valueOf("#ffe4c4");
@@ -164,19 +162,27 @@ public class Workspace extends AppWorkspaceComponent {
         
         //Add Button Functionality Structure
         shapeSelector.setOnAction(e -> {
+            resetEffects();
             currentMouseState = MouseState.SELECTOR;
+            shapeSelector.setEffect(new Lighting());
             reloadWorkspace();
         });
         removeButton.setOnAction(e -> {
+            resetEffects();
             currentMouseState = MouseState.REMOVAL;
+            removeButton.setEffect(new Lighting());
             reloadWorkspace();
         });
         createRectButton.setOnAction(e -> {
+            resetEffects();
             currentMouseState = MouseState.CREATE_RECT;
+            createRectButton.setEffect(new Lighting());
             reloadWorkspace();
         });
         createEllipseButton.setOnAction(e -> {
+            resetEffects();
             currentMouseState = MouseState.CREATE_ELLIPSE;
+            createEllipseButton.setEffect(new Lighting());
             reloadWorkspace();
         });
         
@@ -325,8 +331,8 @@ public class Workspace extends AppWorkspaceComponent {
                         imageDestination = new File(imageDestination.getPath() + ".png");
                     try (ImageOutputStream out = ImageIO.createImageOutputStream(imageDestination)) {
                         ImageIO.write(
-                                SwingFXUtils.fromFXImage(snapshot, null), "png",
-                                out
+                            SwingFXUtils.fromFXImage(snapshot, null), "png",
+                            out
                         );
                     }
                 }
@@ -411,6 +417,32 @@ public class Workspace extends AppWorkspaceComponent {
         return shapeStack;
     }
     
+    public void setBackgroundColor(Paint color){
+        activeColors
+        .get(ColorPickerIndex.BACKGROUNDCOLOR.ordinal())
+        .setValue(
+            Color.valueOf(color.toString())
+        );
+        appDrawSpace.setBackground(
+            new Background(
+                new BackgroundFill(
+                    color,
+                    CornerRadii.EMPTY,
+                    Insets.EMPTY
+                )
+            )
+        );
+    }
+    
+    public void resetEffects(){
+        if(shapeManipulators != null){
+            shapeManipulators.get(ShapeManipulatorIndex.SHAPESELECTOR.ordinal()).setEffect(null);
+            shapeManipulators.get(ShapeManipulatorIndex.REMOVE.ordinal()).setEffect(null);
+            shapeManipulators.get(ShapeManipulatorIndex.RECT.ordinal()).setEffect(null);
+            shapeManipulators.get(ShapeManipulatorIndex.ELLIPSE.ordinal()).setEffect(null);
+        }
+    }
+    
     public void resetWorkspace(){
         try{
             selectedShape = null;
@@ -422,14 +454,15 @@ public class Workspace extends AppWorkspaceComponent {
             appDrawSpace.setBackground(
                 new Background(
                     new BackgroundFill(
-                            activeColors.get(
-                                ColorPickerIndex.BACKGROUNDCOLOR.ordinal()
-                            ).getValue(),
-                            CornerRadii.EMPTY,
-                            Insets.EMPTY
+                        activeColors.get(
+                            ColorPickerIndex.BACKGROUNDCOLOR.ordinal()
+                        ).getValue(),
+                        CornerRadii.EMPTY,
+                        Insets.EMPTY
                     )
                 )
             );
+            resetEffects();
         }catch(NullPointerException NPE){}
     }
     
@@ -583,6 +616,6 @@ public class Workspace extends AppWorkspaceComponent {
      */
     @Override
     public void reloadWorkspace() {
-        
+        //Nothing to see here all workspace management is taken care of automatically.
     }
 };

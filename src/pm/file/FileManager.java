@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.collections.ObservableList;
@@ -27,7 +26,6 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
-import javax.json.JsonValue;
 import javax.json.JsonWriter;
 import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
@@ -206,9 +204,7 @@ public class FileManager implements AppFileComponent {
 	
 	// AND GET THE BACKGROUND COLOR
 	String backgroundColor = json.getString("background-color");
-	workspace.getDrawPane().setBackground(
-            new Background(new BackgroundFill(Paint.valueOf(backgroundColor),CornerRadii.EMPTY,Insets.EMPTY))
-        );
+	workspace.setBackgroundColor(Paint.valueOf(backgroundColor));
     }
 
     // HELPER METHOD FOR LOADING DATA FROM A JSON FORMAT

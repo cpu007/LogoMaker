@@ -20,7 +20,7 @@ import saf.components.AppWorkspaceComponent;
  * JavaFX application.
  * 
  * @author Richard McKenna
- * @author ?
+ * @author Kenneth Chiguichon
  * @version 1.0
  */
 public class PoseMaker extends AppTemplate {

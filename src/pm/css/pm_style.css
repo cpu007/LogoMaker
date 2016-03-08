@@ -25,21 +25,21 @@
 .max_pane {
     -fx-fit-to-height: true;
     -fx-fit-to-width: true;
-    -fx-background-color:#ccccff;
+    -fx-background-color:lightgrey;
     -fx-border-width: 2px;
-    -fx-border-color: #7777dd;
+    -fx-border-color: dimgrey;
     -fx-border-style: solid;
 }
 
 
 // CSS CLASS FOR OUR BIG PANES
 .bordered_pane {
-    -fx-background-color: #aaaaff;
+    -fx-background-color: darksalmon;
     -fx-background-radius: 5.0;
     -fx-padding: 15;
     -fx-spacing: 10;
     -fx-border-width: 2px;
-    -fx-border-color: #7777dd;
+    -fx-border-color: black;
 }
 
 // CSS CLASS FOR LABELS HEADING LARGE SECTIONS IN THE GUI
