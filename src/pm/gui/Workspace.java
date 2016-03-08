@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -82,7 +83,7 @@ public class Workspace extends AppWorkspaceComponent {
     private Shape selectedShape;
     
     public ArrayList<ColorPicker> activeColors;
-    public HashMap<Shape,Dimension2D> shapes;
+    public Stack<Shape> shapeStack;
     public ArrayList<Button> shapeManipulators;
     public double currentOutlineThickness = 5;
     
@@ -137,7 +138,7 @@ public class Workspace extends AppWorkspaceComponent {
 	// WE'LL ORGANIZE OUR WORKSPACE COMPONENTS USING A BORDER PANE
 	workspace = new BorderPane();
         activeColors = new ArrayList();
-        shapes = new HashMap();  
+        shapeStack = new Stack<>();
         shapeManipulators = new ArrayList();
         appDrawSpace = new Pane();
         sideToolbar = new VBox();
@@ -198,12 +199,16 @@ public class Workspace extends AppWorkspaceComponent {
         sendToBackButton.setOnAction(e -> {
             if(selectedShape != null){
                 selectedShape.toBack();
+                shapeStack.remove(selectedShape);
+                shapeStack.add(0, selectedShape);
             }
         });
         
         sendToFrontButton.setOnAction(e -> {
             if(selectedShape != null){
                 selectedShape.toFront();
+                shapeStack.remove(selectedShape);
+                shapeStack.push(selectedShape);
             }
         });
         
@@ -402,8 +407,8 @@ public class Workspace extends AppWorkspaceComponent {
         return appDrawSpace;
     }
     
-    public HashMap<Shape, Dimension2D> getShapes(){
-        return shapes;
+    public Stack<Shape> getShapeStack(){
+        return shapeStack;
     }
     
     public void resetWorkspace(){
@@ -503,13 +508,13 @@ public class Workspace extends AppWorkspaceComponent {
         switch (currentMouseState){
             case CREATE_RECT:
                 Rectangle tempRect = (Rectangle)selectedShape;
-                if(selectedShape != null && !shapes.containsKey(selectedShape))
-                    shapes.put(selectedShape,new Dimension2D(tempRect.getX(),tempRect.getY()));
+                if(selectedShape != null && !shapeStack.contains(selectedShape))
+                    shapeStack.push(selectedShape);
                 break;
             case CREATE_ELLIPSE:
                 Ellipse tempEllipse = (Ellipse)selectedShape;
-                if(selectedShape != null && !shapes.containsKey(selectedShape))
-                    shapes.put(selectedShape,new Dimension2D(tempEllipse.getCenterX(),tempEllipse.getCenterY()));
+                if(selectedShape != null && !shapeStack.contains(selectedShape))
+                    shapeStack.push(selectedShape);
                 break;
             default:
                 break;
@@ -527,8 +532,8 @@ public class Workspace extends AppWorkspaceComponent {
                     tempShape.setStroke(Paint.valueOf("yellow"));
                     break;
                 case REMOVAL:
-                    if(shapes.containsKey(tempShape))
-                        shapes.remove(tempShape);
+                    if(shapeStack.contains(tempShape))
+                        shapeStack.remove(tempShape);
                     appDrawSpace.getChildren().remove(tempShape);
                     break;
                 default:

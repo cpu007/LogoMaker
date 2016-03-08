@@ -1,6 +1,7 @@
 package pm.data;
 
 import java.util.HashMap;
+import java.util.Stack;
 import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
@@ -47,8 +48,8 @@ public class DataManager implements AppDataComponent {
         return workspace;
     }
     
-    public HashMap<Shape,Dimension2D> getShapes(){
-        if(workspace != null) return workspace.shapes;
+    public Stack<Shape> getShapes(){
+        if(workspace != null) return workspace.shapeStack;
         else return null;
     }
     
@@ -63,7 +64,7 @@ public class DataManager implements AppDataComponent {
     public void reset() {
         if(workspace != null){
             workspace.getDrawPane().getChildren().clear();
-            workspace.shapes.clear();
+            workspace.shapeStack.clear();
             workspace.resetWorkspace();
             workspace.reloadWorkspace();            
         }

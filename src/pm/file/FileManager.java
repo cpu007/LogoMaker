@@ -10,8 +10,10 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.collections.ObservableList;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -64,10 +66,12 @@ public class FileManager implements AppFileComponent {
 	DataManager dataManager = (DataManager)data;
         
         Shape selectedShape = dataManager.getSelectedShape();
+        
+        ObservableList<Node> shapeChildList = dataManager.getWorkspace().getDrawPane().getChildren();
 
 	//Build Shapes Array
 	JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        dataManager.getShapes().keySet().stream().map((shape) -> {
+        dataManager.getShapes().stream().map((shape) -> {
             JsonObjectBuilder shapeObjectBuilder = Json.createObjectBuilder();
             if(shape instanceof Rectangle) shapeObjectBuilder.add("Type", "Rectangle");
             else if(shape instanceof Ellipse) shapeObjectBuilder.add("Type", "Ellipse");
@@ -96,9 +100,11 @@ public class FileManager implements AppFileComponent {
                     .add("Coordinates", coordinates)
                     .add("Dimensions", dimensions)
                     .add("fill-color", shape.getFill().toString())
-                    .add("border-color", (shape != selectedShape)?
+                    .add("border-color", 
+                        (shape != selectedShape)?
                             shape.getStroke().toString():
-                            dataManager.getSelectedOutlineFill())
+                            dataManager.getSelectedOutlineFill()
+                    )
                     .add("border-width", shape.getStrokeWidth());
             return shapeObjectBuilder;
         }).forEach((shapeObjectBuilder) -> {
@@ -193,7 +199,7 @@ public class FileManager implements AppFileComponent {
             tempShape.setFill(fillColor);
             tempShape.setStroke(borderColor);
             tempShape.setStrokeWidth(borderWidth);
-            dataManager.getShapes().put(tempShape, shapeLocation);
+            dataManager.getShapes().push(tempShape);
             workspace.getDrawPane().getChildren().add(tempShape);
             workspace.setShapeListeners(tempShape);
         }

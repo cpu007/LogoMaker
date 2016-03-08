@@ -5,6 +5,20 @@
         {
             "Type":"Rectangle",
             "Coordinates":{
+                "x-location":288.0,
+                "y-location":767.0
+            },
+            "Dimensions":{
+                "width":168.0,
+                "height":120.0
+            },
+            "fill-color":"0xcce6ffff",
+            "border-color":"0x4d66ccff",
+            "border-width":11.0
+        },
+        {
+            "Type":"Rectangle",
+            "Coordinates":{
                 "x-location":136.0,
                 "y-location":103.0
             },
@@ -14,48 +28,6 @@
             },
             "fill-color":"0xe6e680ff",
             "border-color":"0x334db3ff",
-            "border-width":20.0
-        },
-        {
-            "Type":"Ellipse",
-            "Coordinates":{
-                "x-location":486.0,
-                "y-location":574.0
-            },
-            "Dimensions":{
-                "width":106.0,
-                "height":114.0
-            },
-            "fill-color":"0x1a3399ff",
-            "border-color":"0x000000ff",
-            "border-width":20.0
-        },
-        {
-            "Type":"Ellipse",
-            "Coordinates":{
-                "x-location":1049.0,
-                "y-location":782.0
-            },
-            "Dimensions":{
-                "width":86.0,
-                "height":85.0
-            },
-            "fill-color":"0xffccffff",
-            "border-color":"0x99cc99ff",
-            "border-width":5.0
-        },
-        {
-            "Type":"Rectangle",
-            "Coordinates":{
-                "x-location":1318.0,
-                "y-location":709.0
-            },
-            "Dimensions":{
-                "width":206.0,
-                "height":139.0
-            },
-            "fill-color":"0x999933ff",
-            "border-color":"0xb34d1aff",
             "border-width":20.0
         },
         {
@@ -75,20 +47,6 @@
         {
             "Type":"Rectangle",
             "Coordinates":{
-                "x-location":288.0,
-                "y-location":767.0
-            },
-            "Dimensions":{
-                "width":168.0,
-                "height":120.0
-            },
-            "fill-color":"0xcce6ffff",
-            "border-color":"0x4d66ccff",
-            "border-width":11.0
-        },
-        {
-            "Type":"Rectangle",
-            "Coordinates":{
                 "x-location":1164.0,
                 "y-location":231.0
             },
@@ -101,18 +59,46 @@
             "border-width":5.0
         },
         {
-            "Type":"Rectangle",
+            "Type":"Ellipse",
             "Coordinates":{
-                "x-location":1351.0,
-                "y-location":150.0
+                "x-location":486.0,
+                "y-location":574.0
             },
             "Dimensions":{
-                "width":200.0,
-                "height":360.0
+                "width":106.0,
+                "height":114.0
             },
-            "fill-color":"0xb3e6b3ff",
-            "border-color":"0x1a4d1aff",
+            "fill-color":"0x1a3399ff",
+            "border-color":"0x000000ff",
             "border-width":20.0
+        },
+        {
+            "Type":"Ellipse",
+            "Coordinates":{
+                "x-location":141.0,
+                "y-location":578.0
+            },
+            "Dimensions":{
+                "width":76.0,
+                "height":83.0
+            },
+            "fill-color":"0x4d1a4dff",
+            "border-color":"0xccffffff",
+            "border-width":9.272727272727273
+        },
+        {
+            "Type":"Ellipse",
+            "Coordinates":{
+                "x-location":1049.0,
+                "y-location":782.0
+            },
+            "Dimensions":{
+                "width":86.0,
+                "height":85.0
+            },
+            "fill-color":"0xffccffff",
+            "border-color":"0x99cc99ff",
+            "border-width":5.0
         },
         {
             "Type":"Rectangle",
@@ -129,18 +115,32 @@
             "border-width":5.0
         },
         {
-            "Type":"Ellipse",
+            "Type":"Rectangle",
             "Coordinates":{
-                "x-location":141.0,
-                "y-location":578.0
+                "x-location":1318.0,
+                "y-location":709.0
             },
             "Dimensions":{
-                "width":76.0,
-                "height":83.0
+                "width":206.0,
+                "height":139.0
             },
-            "fill-color":"0x4d1a4dff",
-            "border-color":"0xccffffff",
-            "border-width":9.272727272727273
+            "fill-color":"0x999933ff",
+            "border-color":"0xb34d1aff",
+            "border-width":20.0
+        },
+        {
+            "Type":"Rectangle",
+            "Coordinates":{
+                "x-location":1351.0,
+                "y-location":150.0
+            },
+            "Dimensions":{
+                "width":200.0,
+                "height":360.0
+            },
+            "fill-color":"0xb3e6b3ff",
+            "border-color":"0x1a4d1aff",
+            "border-width":20.0
         }
     ]
 }
